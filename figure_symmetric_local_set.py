@@ -6,24 +6,74 @@ from triangle_inequalities import (GHZ, W1, W2, W3, W4, W5,
                                    W5_point_closed_loop, valid_distribution)
 
 
-print(vtk)
-
-
 # ------------------------------------------------------ variable step 1d array
-def non_uniform_space(start, end, N_points, end_start_ratio):
-    N = N_points # number of points
-    r = end_start_ratio # shrinking ratio (end step)/(start step)
-    alpha, beta = np.linalg.solve([[N*(N - 1)/2, N - 1], [N - 1 - r, 1 - r]], 
+def non_uniform_space(start, end, n_points, end_start_ratio):
+    """
+        Generates an array of `n_points` between `start` and `end` with a variable step rate.
+
+        The step size changes linearly, and the ratio of the last step size to the first
+        step size is controlled by the `end_start_ratio` parameter. This allows for
+        non-uniform spacing of points, where the step size can either increase or decrease
+        across the sequence.
+
+        Parameters:
+        -----------
+        start : float
+            The starting value of the sequence.
+        end : float
+            The ending value of the sequence.
+        n_points : int
+            The number of points in the sequence.
+        end_start_ratio : float
+            The ratio of the last step size to the first step size.
+            - If `end_start_ratio > 1`, the step size increases across the sequence.
+            - If `end_start_ratio < 1`, the step size decreases across the sequence.
+            - If `end_start_ratio == 1`, the step size is constant (equivalent to `numpy.linspace`).
+
+        Returns:
+        --------
+        numpy.ndarray
+            An array of `n_points` values between `start` and `end` with a variable step rate.
+
+        Notes:
+        ------
+        - The step size changes linearly, meaning the difference between consecutive steps
+          is constant.
+        - The function solves a system of linear equations to determine the coefficients
+          for the step size formula.
+
+        Examples:
+        ---------
+        >>> # Increasing step size
+        >>> arr = non_uniform_space(0, 10, 5, 2)
+        >>> print(arr)
+        [ 0.          1.66666667  3.88888889  6.66666667 10.        ]
+
+        >>> # Decreasing step size
+        >>> arr = non_uniform_space(0, 10, 5, 0.5)
+        >>> print(arr)
+        [0.         3.33333333 6.11111111 8.33333333 10.        ]
+
+        >>> # Constant step size (equivalent to numpy.linspace)
+        >>> arr = non_uniform_space(0, 10, 5, 1)
+        >>> print(arr)
+        [0.  2.5 5.  7.5 10. ]
+        """
+    n = n_points  # number of points
+    r = end_start_ratio  # shrinking ratio (end step)/(start step)
+    alpha, beta = np.linalg.solve([[n*(n - 1)/2, n - 1],
+                                   [n - 1 - r, 1 - r]],
                                   [end - start, 0])
-    k = np.linspace(0, N-1, N)
+    k = np.linspace(0, n-1, n)
     return start + k*beta + k*(k + 1)*alpha/2
 
+
 # -------------------------------------------------------- Full behavior space
-behavior_space = pv.PolyData([[1, 1, 1], 
-                              [-1, 1, -1], 
-                              [1/3, -1/3, -1], 
-                              [-1/3, -1/3, 1]], 
-                              [3, 0, 1, 2, 3, 0, 1, 3, 3, 0, 2, 3, 3, 1, 2, 3])
+behavior_space = pv.PolyData([[1, 1, 1],         # D+
+                              [-1, 1, -1],       # D-
+                              [1/3, -1/3, -1],   # W
+                              [-1/3, -1/3, 1]],  # W flipped
+                             [3, 0, 1, 2, 3, 0, 1, 3, 3, 0, 2, 3, 3, 1, 2, 3])
 
 # ---------------------------------------------------------------- GHZ surface
 anum = np.linspace(0,1,101)
@@ -42,17 +92,16 @@ e2 = e2[~np.isnan(anum)]
 e3 = e3[~np.isnan(anum)]
 
 GHZ_boundary_behaviors = pv.PolyData(np.vstack((e1, e2, e3)).T)
-GHZ_boundary_behaviors_surface = GHZ_boundary_behaviors.delaunay_2d(progress_bar=False, 
-                                                            alpha=0)
+GHZ_boundary_behaviors_surface = GHZ_boundary_behaviors.delaunay_2d()
 GHZ_boundary_behaviors_surface = GHZ_boundary_behaviors.reconstruct_surface()
-GHZ_boundary_behaviors_surface = GHZ_boundary_behaviors_surface.clip((1,1,-1), 
-                                                                     (1,0,0))
-GHZ_boundary_behaviors_surface = GHZ_boundary_behaviors_surface.clip((-1,1,1), 
-                                                                     (0,0,1))
+GHZ_boundary_behaviors_surface = GHZ_boundary_behaviors_surface.clip((1, 1, -1),
+                                                                     (1, 0, 0))
+GHZ_boundary_behaviors_surface = GHZ_boundary_behaviors_surface.clip((-1, 1, 1),
+                                                                     (0, 0, 1))
 
 # --------------------------------------------------------- Flipped GHZ surface
 GHZ_boundary_behaviors2 = pv.PolyData(np.vstack((-e1, e2, -e3)).T)
-GHZ_boundary_behaviors_surface2 = GHZ_boundary_behaviors2.delaunay_2d(progress_bar=False, alpha=0)
+GHZ_boundary_behaviors_surface2 = GHZ_boundary_behaviors2.delaunay_2d()
 GHZ_boundary_behaviors_surface2 = GHZ_boundary_behaviors2.reconstruct_surface()
 GHZ_boundary_behaviors_surface2 = GHZ_boundary_behaviors_surface2.clip((1,1,-1), 
                                                                        (1,0,0))
@@ -60,8 +109,8 @@ GHZ_boundary_behaviors_surface2 = GHZ_boundary_behaviors_surface2.clip((-1,1,1),
                                                                        (0,0,1))
 
 # ------------------------------------------------------- Clipping GHZ surfaces
-GHZ1 = GHZ_boundary_behaviors_surface.clip_surface(GHZ_boundary_behaviors_surface2, 
-                                               invert=False)
+GHZ1 = GHZ_boundary_behaviors_surface.clip_surface(
+    GHZ_boundary_behaviors_surface2, invert=False)
 GHZ2 = GHZ_boundary_behaviors_surface2.clip_surface(GHZ_boundary_behaviors_surface)
 
 # ---------------------------------------------------------------- 322 W models
@@ -281,21 +330,12 @@ with np.load('W_333_1_points.npz') as data:
 W_333_1 = pv.PolyData(np.vstack((e1, e2, e3)).T)
 W_333_1 = W_333_1.delaunay_2d(tol=1e-5, alpha=0.1, bound=True, progress_bar=True)
 
-# ----------------------------------------------------------- Clipping surfaces
-# W_332 = W_332.clip_surface(W_422, invert=False).clip_surface(W_333_1)
-# W_332, W_422 = (W_332.clip_surface(W_422, invert=False), 
-#                 W_422.clip_surface(W_332, invert=False))
-
 # --------------------------------------------------------- Decimating surfaces
 W_322 = W_322.decimate(0.74)
 W_422 = W_422.decimate(0.80)
 W_332 = W_332.decimate(0.95)
 W_333_0 = W_333_0.decimate(0.96)
 W_333_1 = W_333_1.decimate(0.24)
-
-# surfaces = [W_322, W_422, W_332, W_333_0, W_333_1]
-# for surface in surfaces:
-#     print(surface.points.size, surface.volume, surface.points.size/surface.volume)
 
 # ---------------------------------------------------------- Flipped W surfaces
 W_322_flip = W_322.reflect([1,0,0]).reflect([0,0,1])
@@ -304,35 +344,13 @@ W_332_flip = W_332.reflect([1,0,0]).reflect([0,0,1])
 W_333_0_flip = W_333_0.reflect([1,0,0]).reflect([0,0,1])
 W_333_1_flip = W_333_1.reflect([1,0,0]).reflect([0,0,1])
 
-# ----------------------------------------------------------------- Test volume
-N = 1
-e1 = np.linspace(-1, 1, 3*N)
-e2 = np.linspace(-1/3, 1, 2*N)
-e3 = np.linspace(-1, 1, N)
-e1, e2, e3 = np.meshgrid(e1, e2, e3)
-valid = valid_distribution(e1, e2, e3)
-e1, e2, e3 = e1[valid], e2[valid], e3[valid]
-GHZ_test = (GHZ(e1, e2, e3, flip=False) >= 0) | (GHZ(e1, e2, e3, flip=True) >= 0)
-W_test = ((W1(e1, e2, e3, flip=False) >= 0) | (W2(e1, e2, e3, flip=False) >= 0)
-          | (W3(e1, e2, e3, flip=False) >= 0) | (W4(e1, e2, e3, flip=False) >= 0)
-          | (W5(e1, e2, e3, flip=False) >= 0))
-Wbar_test = ((W1(e1, e2, e3, flip=True) >= 0) | (W2(e1, e2, e3, flip=True) >= 0) 
-             | (W3(e1, e2, e3, flip=True) >= 0) | (W4(e1, e2, e3, flip=True) >= 0) 
-             | (W5(e1, e2, e3, flip=True) >= 0))
-local = GHZ_test & W_test & Wbar_test
-e1, e2, e3 = e1[local], e2[local], e3[local]
-test_volume = pv.PolyData(np.vstack((e1, e2, e3)).T)
-# test_volume = test_volume.delaunay_3d(progress_bar=True)
-
 # ----------------------------------------------------------------------- Plot
 
 pv.global_theme.font.family = 'times'
 pl = pv.Plotter()
-# pl = pv.Plotter(off_screen=True)
-
-pl.add_mesh(test_volume, color='brown')
 
 pl.add_mesh(behavior_space, opacity=0.3)
+
 pl.add_mesh(GHZ1, show_edges=True, color='blue')
 pl.add_mesh(GHZ2, show_edges=True, color='blue')
 
@@ -348,95 +366,34 @@ pl.add_mesh(W_422_flip, show_edges=True, color='purple')
 pl.add_mesh(W_333_0_flip, show_edges=True, color='red')
 pl.add_mesh(W_333_1_flip, show_edges=True, color='cyan')
 
-# pl.add_mesh(pv.PolyData([(0.33169746130143063, -0.02579146918085787, -0.5234097023869806), 
-#                          (0.3335198869691169, -0.005199463752852189, -0.49416759476703065)]), 
-#             color='black')
-# e1 = 0.24
-# e2 = -0.275
-# pl.add_mesh(pv.Line((e1, e2, max(-1+e1+e2, -1-3*e1-3*e2)), 
-#                     (e1, e2, min(1+e1-e2, 1-3*e1+3*e2))))
-
-# red cyan intersection
-# pl.add_mesh(pv.Sphere(0.005, (1/3, -5/27, -5/9)), color='yellow')
-# yellow purple intersection
-# pl.add_mesh(pv.Sphere(0.005, (1/3, 1/9, -5/9)), color='yellow')
-# green W-D1 line intersection
-# pl.add_mesh(pv.Sphere(0.005, (0, 0, -1)), color='yellow')
-# green red intersection
+# # red cyan intersection
+# pl.add_mesh(pv.Sphere(0.005, (1/3, -5/27, -5/9)), color='black')
+# # yellow purple intersection
+# pl.add_mesh(pv.Sphere(0.005, (1/3, 1/9, -5/9)), color='black')
+# # green W-D1 line intersection
+# pl.add_mesh(pv.Sphere(0.005, (0, 0, -1)), color='black')
+# # green red intersection
 # e3_intersection = np.roots([1, 6, 24, -6, -9])[3].real
-# pl.add_mesh(pv.Sphere(0.005, (-e3_intersection/3,-1/3, e3_intersection)), color='yellow')
-# green red cyan yellow intersection
-# pl.add_mesh(pv.Sphere(0.005, (-2+np.sqrt(5), 9-4*np.sqrt(5), 6-3*np.sqrt(5))), color='yellow')
-# cyan purple yellow W-D0 line intersection
-# pl.add_mesh(pv.Sphere(0.005, (1/2, 0, -1/2)), color='yellow')
-
-# pl.add_mesh(pv.Sphere(0.005, [ 0.08988764, -0.14205345, -0.77626207]), color='yellow')
-# pl.add_mesh(pv.Sphere(0.005, (0.08426966292134831, 0.004219409282700426, -0.9061948576147981)), color='yellow')
-
-# pl.add_mesh(pv.Sphere(0.005, [-0.5    ,  0.4375 , -0.03125]), color='black')
-# points = np.array([[-0.5    ,  0.1875 ,  0.09375],
-#                    [ 0.     ,  0.25   ,  0.     ],
-#                    [ 0.     ,  0.     ,  0.5    ],
-#                    [ 0.     ,  0.     , -0.5    ]])
-# for point in points:
-#     pl.add_mesh(pv.Sphere(0.005, point), color='yellow')
-
-# pl.add_mesh(pv.Line((1/2, 0, -1/2), (1/3, -5/27, -5/9)))
-# pl.add_mesh(pv.lines_from_points([(e1, 
-#                                     (2*np.sqrt(2*(3*e1-1))*(1-3*e1)+36*e1-17)/27, 
-#                                     1-3*e1+(2*np.sqrt(2*(3*e1-1))*(1-3*e1)+36*e1-17)/9) 
-#                                   for e1 in np.linspace(1/3,1/2,40)]), 
-#             color='black', line_width=5)
-
-# pl.add_mesh(pv.Arrow([ 0.24135132, -0.1712157 , -0.57155486], 
-#                      [ 0.5268123 , -0.3713671 , -0.69316393], 
-#                      scale=0.1), 
-#             color='red')
-# pl.add_mesh(pv.Arrow([ 0.33116586, -0.08411133, -0.54918228], 
-#                      [ 0.41532204, -0.04592793, -0.8338791 ], 
-#                      scale=0.1), 
-#             color='cyan')
-
-# pl.add_mesh(pv.Plane(center=(1/3, 0, 0), direction=(1, 0, 0), i_size=2, j_size=2), opacity=0.5, show_edges=True)
-# pl.add_mesh(pv.Plane(center=(0, -1/3, 0), direction=(0, 1, 0), i_size=2, j_size=2), opacity=0.5, show_edges=True)
-# pl.add_mesh(pv.Plane(center=(0, 0, -0.455), direction=(0, -0.5, 1)), opacity=0.5, show_edges=True)
-# pl.add_mesh(pv.Plane(center=(0.5, 0, -0.6), direction=(3, -3, 1), i_size=2, j_size=2), show_edges=True, opacity=0.5)
-# pl.add_mesh(pv.Plane(center=(5/27, -1/3, -5/9), direction=(-1, 1, 1), i_size=2, j_size=2), show_edges=True, opacity=0.5)
+# pl.add_mesh(pv.Sphere(0.005, (-e3_intersection/3,-1/3, e3_intersection)), color='black')
+# # green red cyan yellow intersection
+# pl.add_mesh(pv.Sphere(0.005, (-2+np.sqrt(5), 9-4*np.sqrt(5), 6-3*np.sqrt(5))), color='black')
+# # cyan purple yellow W-D0 line intersection
+# pl.add_mesh(pv.Sphere(0.005, (1/2, 0, -1/2)), color='black')
 
 pl.add_point_labels([(0, 1, 0)], [r'$GHZ$'], show_points=True, point_size=1, 
                     point_color='black', font_family='times', always_visible=True)
 pl.add_point_labels([(0, 0, 0)], [r'$U$'], show_points=True, point_size=10, 
                     point_color='black', font_family='times', always_visible=True, 
                     render_points_as_spheres=True)
-pl.add_point_labels([(1, 1, 1)], [r'$D_0$'], show_points=True, point_size=1, 
+pl.add_point_labels([(1, 1, 1)], [r'$D_+$'], show_points=True, point_size=1, 
                     point_color='black', font_family='times', always_visible=True)
-pl.add_point_labels([(-1, 1, -1)], [r'$D_1$'], show_points=True, point_size=1, 
+pl.add_point_labels([(-1, 1, -1)], [r'$D_-$'], show_points=True, point_size=1, 
                     point_color='black', font_family='times', always_visible=True)
 pl.add_point_labels([(1/3, -1/3, -1)], [r'$W$'], show_points=True, point_size=1, 
                     point_color='black', font_family='times', always_visible=True)
-pl.add_point_labels([(-1/3, -1/3, 1)], [r'$~W$'], show_points=True, point_size=1, 
+pl.add_point_labels([(-1/3, -1/3, 1)], [r'$\overline{W}$'], show_points=True, point_size=1,
                     point_color='black', font_family='times', always_visible=True)
 
-# pl.add_axes_at_origin(xlabel=r'', ylabel=r'', zlabel=r'')
-# pl.add_axes(xlabel=r'$E_1$', ylabel=r'$E_2$', zlabel=r'$E_3$')
-
-# path = r''
-# path = r'C:\Users\mario\OneDrive\Área de Trabalho\\'
-# for elevation in range(70, 110+10, 10):
-#     for azimuth in range(220, 260+10, 10):
-#         pl.camera.elevation = elevation
-#         pl.camera.azimuth = azimuth
-#         pl.save_graphic(path + f'elevation {elevation} azimuth {azimuth}.pdf')
-
-
-def my_cpos_callback(*args):
-    pl.add_text(str(pl.camera_position), name="cpos")
-    return
-
-
-# pl.iren.add_observer(vtk.vtkCommand.EndInteractionEvent, my_cpos_callback)
-
-# ax = pl.add_axes_at_origin(xlabel=r'', ylabel=r'', zlabel=r'', line_width=20)
 marker = pv.create_axes_marker(xlabel=r'', ylabel=r'', zlabel=r'', 
                                line_width=2, cone_radius=0.2, shaft_length=0.8, 
                                tip_length=0.2)
@@ -453,28 +410,8 @@ pl.add_point_labels([(0, 0, 1)], [r'$E_3$'], show_points=False,
 
 pl.view_xy(negative=True)
 
-pl.show()
+pl.camera_position = ((3.54, 0.46, 5.66),
+                      (0, 0, 0),
+                      (-0.74, -0.45, 0.5))
 
-# ------------------------------------------------------- Save figures for paper
-# path = r'C:/Users/mario/OneDrive/Documentos/Doutorado/Tese/Artigos' \
-#         r'/Symmetric network local set/'
-# scale = 10
-# pl.camera_position = ((-2.14, -0.378, -6.33),
-#                       (9.37e-5, 0, 8.58e-5),
-#                       (0.825, -0.508, -0.248))
-# # marker.SetNormalizedLabelPosition(1, 1, 0.9)
-# pl.screenshot(filename=path + r'3d_perspective_0.png', return_img=False, 
-#               scale=scale)
-# pl.camera_position = ((3.54, 0.46, 5.66),
-#                       (0, 0, 0),
-#                       (-0.74, -0.45, 0.5))
-# # marker.SetNormalizedLabelPosition(1.2, 1, 0.7)
-# pl.screenshot(filename=path + r'3d_perspective_1.png', return_img=False, 
-#               scale=scale)
-# pl.camera_position = ((1.34, -1.39, 6.41),
-#                       (0, 0, 0),
-#                       (-0.11, 0.97, 0.23))
-# # marker.SetNormalizedLabelPosition(1, 1, 0.6)
-# pl.screenshot(filename=path + r'3d_perspective_2.png', return_img=False, 
-#               scale=scale)
-# pl.close()
+pl.show()
