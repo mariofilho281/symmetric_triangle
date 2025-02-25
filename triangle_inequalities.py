@@ -271,7 +271,7 @@ def W4_point(e1, e2):
             e3[i] = np.min((1/2)*(16*a**2*c**2*e1_ - 4*a**2*c*e1_**2 - 22*a**2*c*e1_ + 6*a**2*c*e2_ + 6*a**2*c + 8*a**2*e1_ - 4*a**2*e2_ - 4*a**2 - 4*a*c**2*e1_**2 - 22*a*c**2*e1_ + 6*a*c**2*e2_ + 6*a*c**2 + 18*a*c*e1_**2 - 6*a*c*e1_*e2_ + 20*a*c*e1_ - 10*a*c*e2_ - 10*a*c - 8*a*e1_**2 + 4*a*e1_*e2_ - 4*a*e1_ + 4*a*e2_ + 4*a + 8*c**2*e1_ - 4*c**2*e2_ - 4*c**2 - 8*c*e1_**2 + 4*c*e1_*e2_ - 4*c*e1_ + 4*c*e2_ + 4*c + 2*e1_**3 - e1_**2*e2_ + 3*e1_**2 - 2*e1_*e2_ - e2_ - 1)/(a*c*(a + c - e1_ - 1)))
     return e3.reshape(e1.shape)
 
-def W5_point_closed_loop(e1, e2):
+def W5_point(e1, e2):
     e1, e2 = np.broadcast_arrays(*np.atleast_1d(e1, e2))
     e3 = np.full_like(e1.flatten(), np.inf)
     
@@ -332,7 +332,7 @@ def W5_point_closed_loop(e1, e2):
             e3[i] = e3fun(a, c, e1_, e2_)
     return e3
 
-def W5_point(e1, e2):
+def W5_point_fixed_initial_guesses(e1, e2):
     e1, e2 = np.broadcast_arrays(*np.atleast_1d(e1, e2))
     e3 = np.full_like(e1.flatten(), np.inf)
     initial_guesses = np.array([[0.28, 0.44], 

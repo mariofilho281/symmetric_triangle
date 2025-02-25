@@ -260,42 +260,46 @@ W_332 = pv.PolyData(points)
 W_332 = W_332.delaunay_2d(alpha=0.04, progress_bar=True)
 
 # --------------------------------------------------- 333 W models 1 constraint
+
+# The following block of code takes too long to run, so instead I commented it and
+# just read the file with the point coordinates calculated with this procedure.
+
 # N = 15
 # e1 = np.broadcast_to(np.linspace(np.sqrt(5)-2, 1/2, N), (N, N)).T
 # e2 = np.empty_like(e1)
-# for i, e1_ in enumerate(e1[:,0]):
+# for i, e1_ in enumerate(e1[:, 0]):
 #     if e1_ <= 1/3:
-#         e2_min = np.sort(Polynomial([2048*e1_**12 - 3832*e1_**11 + 5508*e1_**10 + 12198*e1_**9 - 20061*e1_**8 + 8084*e1_**7 - 1416*e1_**6 + 9212*e1_**5 - 17250*e1_**4 + 9340*e1_**3 - 500*e1_**2 - 506*e1_ + 71, 
-#                                       -1024*e1_**11 + 2196*e1_**10 + 2796*e1_**9 - 23427*e1_**8 + 29532*e1_**7 - 27680*e1_**6 + 2324*e1_**5 - 25430*e1_**4 + 44052*e1_**3 - 12700*e1_**2 - 624*e1_ + 369, 
-#                                       1062*e1_**9 - 543*e1_**8 + 12636*e1_**7 - 2112*e1_**6 + 43568*e1_**5 + 19706*e1_**4 + 33876*e1_**3 - 31704*e1_**2 + 2682*e1_ + 477, 
-#                                       -729*e1_**8 - 1404*e1_**7 + 1368*e1_**6 - 156*e1_**5 - 18162*e1_**4 - 17620*e1_**3 - 20128*e1_**2 + 5100*e1_ + 243, 
-#                                       -2484*e1_**5 - 3456*e1_**4 - 2664*e1_**3 + 848*e1_**2 + 2268*e1_, 
-#                                       432*e1_**2]).roots())[2]
+#         e2_min = np.sort(Polynomial([2048*e1_**12 - 3832*e1_**11 + 5508*e1_**10 + 12198*e1_**9 - 20061*e1_**8 + 8084*e1_**7 - 1416*e1_**6 + 9212*e1_**5 - 17250*e1_**4 + 9340*e1_**3 - 500*e1_**2 - 506*e1_ + 71,
+#                                      -1024*e1_**11 + 2196*e1_**10 + 2796*e1_**9 - 23427*e1_**8 + 29532*e1_**7 - 27680*e1_**6 + 2324*e1_**5 - 25430*e1_**4 + 44052*e1_**3 - 12700*e1_**2 - 624*e1_ + 369,
+#                                      1062*e1_**9 - 543*e1_**8 + 12636*e1_**7 - 2112*e1_**6 + 43568*e1_**5 + 19706*e1_**4 + 33876*e1_**3 - 31704*e1_**2 + 2682*e1_ + 477,
+#                                      -729*e1_**8 - 1404*e1_**7 + 1368*e1_**6 - 156*e1_**5 - 18162*e1_**4 - 17620*e1_**3 - 20128*e1_**2 + 5100*e1_ + 243,
+#                                      -2484*e1_**5 - 3456*e1_**4 - 2664*e1_**3 + 848*e1_**2 + 2268*e1_,
+#                                      432*e1_**2]).roots())[2]
 #     else:
 #         e2_min = (-5 + 2*(3*e1_-1)*(6 - np.sqrt(2*(3*e1_-1))))/27
 #     e2_max = 9-4*np.sqrt(5)
 #     e2[i] = np.linspace(e2_min, e2_max, N)
 # e1, e2 = e1.flatten(), e2.flatten()
-
-# e3 = W5_point_closed_loop(e1, e2)
-
+#
+# e3 = W5_point(e1, e2)
+#
 # valid = ~np.isinf(e3)
 # e1, e2, e3 = e1[valid], e2[valid], e3[valid]
-
+#
 # # intersection with D0 W Wflip plane
 # e = np.linspace(1/2, 1/3, 30)
 # e1 = np.hstack((e1, e))
 # e2 = np.hstack((e2, (36*e - 17 - np.sqrt(6*e - 2)*(6*e - 2))/27))
 # e3 = np.hstack((e3, (9*e - 8 - np.sqrt(6*e - 2)*(6*e - 2))/9))
-
+#
 # # intersection with red surface
 # e = np.linspace(1/3, 1, 30)
 # a = np.empty_like(e)
 # for i, e_ in enumerate(e):
-#     a[i] = Polynomial([4*e_**2*(1 + e_)**2, 
-#                         -5*e_ - 16*e_**2 - 50*e_**3 - 24*e_**4 - e_**5, 
-#                         1 + 12*e_ + 34*e_**2 + 84*e_**3 + 45*e_**4, 
-#                         -12*e_ - 24*e_**2 - 60*e_**3, 
+#     a[i] = Polynomial([4*e_**2*(1 + e_)**2,
+#                         -5*e_ - 16*e_**2 - 50*e_**3 - 24*e_**4 - e_**5,
+#                         1 + 12*e_ + 34*e_**2 + 84*e_**3 + 45*e_**4,
+#                         -12*e_ - 24*e_**2 - 60*e_**3,
 #                         16*e_**2]).roots()[0].real
 # e1_border = (1-3*a)*e/(a-e)
 # e1_border[0] = 1/3
@@ -306,7 +310,7 @@ W_332 = W_332.delaunay_2d(alpha=0.04, progress_bar=True)
 # e1 = np.hstack((e1, e1_border))
 # e2 = np.hstack((e2, e2_border))
 # e3 = np.hstack((e3, e3_border))
-
+#
 # # intersection with yellow surface
 # e1_border = np.linspace(np.sqrt(5)-2, 1/2, 30)
 # c = np.empty_like(e1_border)
