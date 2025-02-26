@@ -3,7 +3,7 @@ import vtk
 import pyvista as pv
 from numpy.polynomial import Polynomial
 from triangle_inequalities import (GHZ, W1, W2, W3, W4, W5, 
-                                   W5_point_closed_loop, valid_distribution)
+                                   W5_point, valid_distribution)
 
 
 # ------------------------------------------------------ variable step 1d array
@@ -412,10 +412,7 @@ pl.add_point_labels([(0, 0, 1)], [r'$E_3$'], show_points=False,
                     point_color='black', font_family='times', 
                     shape=None, always_visible=True)
 
-pl.view_xy(negative=True)
-
 pl.camera_position = ((3.54, 0.46, 5.66),
                       (0, 0, 0),
                       (-0.74, -0.45, 0.5))
-
 pl.show()
