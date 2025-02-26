@@ -9,56 +9,56 @@ from triangle_inequalities import (GHZ, W1, W2, W3, W4, W5,
 # ------------------------------------------------------ variable step 1d array
 def non_uniform_space(start, end, n_points, end_start_ratio):
     """
-        Generates an array of `n_points` between `start` and `end` with a variable step rate.
+    Generates an array of `n_points` between `start` and `end` with a variable step rate.
 
-        The step size changes linearly, and the ratio of the last step size to the first
-        step size is controlled by the `end_start_ratio` parameter. This allows for
-        non-uniform spacing of points, where the step size can either increase or decrease
-        across the sequence.
+    The step size changes linearly, and the ratio of the last step size to the first
+    step size is controlled by the `end_start_ratio` parameter. This allows for
+    non-uniform spacing of points, where the step size can either increase or decrease
+    across the sequence.
 
-        Parameters:
-        -----------
-        start : float
-            The starting value of the sequence.
-        end : float
-            The ending value of the sequence.
-        n_points : int
-            The number of points in the sequence.
-        end_start_ratio : float
-            The ratio of the last step size to the first step size.
-            - If `end_start_ratio > 1`, the step size increases across the sequence.
-            - If `end_start_ratio < 1`, the step size decreases across the sequence.
-            - If `end_start_ratio == 1`, the step size is constant (equivalent to `numpy.linspace`).
+    Parameters:
+    -----------
+    start : float
+        The starting value of the sequence.
+    end : float
+        The ending value of the sequence.
+    n_points : int
+        The number of points in the sequence.
+    end_start_ratio : float
+        The ratio of the last step size to the first step size.
+        - If `end_start_ratio > 1`, the step size increases across the sequence.
+        - If `end_start_ratio < 1`, the step size decreases across the sequence.
+        - If `end_start_ratio == 1`, the step size is constant (equivalent to `numpy.linspace`).
 
-        Returns:
-        --------
-        numpy.ndarray
-            An array of `n_points` values between `start` and `end` with a variable step rate.
+    Returns:
+    --------
+    numpy.ndarray
+        An array of `n_points` values between `start` and `end` with a variable step rate.
 
-        Notes:
-        ------
-        - The step size changes linearly, meaning the difference between consecutive steps
-          is constant.
-        - The function solves a system of linear equations to determine the coefficients
-          for the step size formula.
+    Notes:
+    ------
+    - The step size changes linearly, meaning the difference between consecutive steps
+      is constant.
+    - The function solves a system of linear equations to determine the coefficients
+      for the step size formula.
 
-        Examples:
-        ---------
-        >>> # Increasing step size
-        >>> arr = non_uniform_space(0, 10, 5, 2)
-        >>> print(arr)
-        [ 0.          1.66666667  3.88888889  6.66666667 10.        ]
+    Examples:
+    ---------
+    >>> # Increasing step size
+    >>> arr = non_uniform_space(0, 10, 5, 2)
+    >>> print(arr)
+    [ 0.          1.66666667  3.88888889  6.66666667 10.        ]
 
-        >>> # Decreasing step size
-        >>> arr = non_uniform_space(0, 10, 5, 0.5)
-        >>> print(arr)
-        [0.         3.33333333 6.11111111 8.33333333 10.        ]
+    >>> # Decreasing step size
+    >>> arr = non_uniform_space(0, 10, 5, 0.5)
+    >>> print(arr)
+    [0.         3.33333333 6.11111111 8.33333333 10.        ]
 
-        >>> # Constant step size (equivalent to numpy.linspace)
-        >>> arr = non_uniform_space(0, 10, 5, 1)
-        >>> print(arr)
-        [0.  2.5 5.  7.5 10. ]
-        """
+    >>> # Constant step size (equivalent to numpy.linspace)
+    >>> arr = non_uniform_space(0, 10, 5, 1)
+    >>> print(arr)
+    [0.  2.5 5.  7.5 10. ]
+    """
     n = n_points  # number of points
     r = end_start_ratio  # shrinking ratio (end step)/(start step)
     alpha, beta = np.linalg.solve([[n*(n - 1)/2, n - 1],
