@@ -415,4 +415,7 @@ pl.add_point_labels([(0, 0, 1)], [r'$E_3$'], show_points=False,
 pl.camera_position = ((3.54, 0.46, 5.66),
                       (0, 0, 0),
                       (-0.74, -0.45, 0.5))
+pl.camera_position = ((1.34, -1.39, 6.41),
+                      (0, 0, 0),
+                      (-0.11, 0.97, 0.23))
 pl.show()
