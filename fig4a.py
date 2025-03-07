@@ -33,10 +33,20 @@ data = np.loadtxt('e1e2_nsi_boundary_old.txt')
 E1NSI = data[:,0]
 E2NSI = data[:,1]
 
-# NSI Alex
+# NSI with higher inflations
 data = np.loadtxt('e1e2_nsi_boundary_improved.txt')
-E1NSIbetter = data[:,0]
-E2NSIbetter = data[:,1]
+
+# Clean up the points where the optimization failed
+take = [True] + ((data[:-1,1] == data[1:,1])
+                 + (data[:-1,1] <= data[1:,1] - 1e-3)).tolist()
+NSIbetter = data[take,:].T
+for _ in range(5):
+        take = [True] + ((NSIbetter[1,:-1] == NSIbetter[1,1:])
+                         + (NSIbetter[1,:-1] <= NSIbetter[1,1:]-1e-3)).tolist()
+        NSIbetter = NSIbetter[:,take]
+        
+E1NSIbetter = NSIbetter[:,0]
+E2NSIbetter = NSIbetter[:,1]
 
 # positivity constraints
 E1_positivity_constraints = np.linspace(0.15, 0.5, 100)
