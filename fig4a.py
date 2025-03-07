@@ -52,34 +52,28 @@ E2NSIbetter = NSIbetter[:,1]
 E1_positivity_constraints = np.linspace(0.15, 0.5, 100)
 E2_positivity_constraints = np.maximum(-1/3, 2*E1_positivity_constraints - 1)
 
-fig, ax = plt.subplots()
+plt.fill_between([0, 0.1], [0, 0.1], [0, 0.1], color='white', label=r'$\bigtriangleup$-local [27]')
 
-ax.fill_between([0, 0.1], [0, 0.1], [0, 0.1], color='white', label=r'$\bigtriangleup$-local [27]')
+plt.fill_between(E1LM, [-0.34]*len(E1LM), E2LM, color='#9048E1', label=r'$\bigtriangleup$-local') #purple
 
-ax.fill_between(E1LM, [-0.34]*len(E1LM), E2LM, color='#9048E1', label=r'$\bigtriangleup$-local') #purple
+plt.fill_between(e1_red, [-0.34]*len(e1_red), e2_red, color='#FFDD69', label='Unknown') #yellow
+plt.fill_between(e1, [-0.34]*len(e1), e2, color='#FFDD69') #yellow
 
-ax.fill_between(e1_red, [-0.34]*len(e1_red), e2_red, color='#FFDD69', label='Unknown') #yellow
-ax.fill_between(e1, [-0.34]*len(e1), e2, color='#FFDD69') #yellow
-
-ax.fill_between(E1NSIbetter, [-0.34]*len(E1NSIbetter), E2NSIbetter,
+plt.fill_between(E1NSIbetter, [-0.34]*len(E1NSIbetter), E2NSIbetter,
                 color='#6ACCD0', label=r'Non-$\bigtriangleup$') #cyan
 
-ax.plot(E1NSI, E2NSI, 'k-', linewidth=1, label=r'Non-$\bigtriangleup$ [27]')
+plt.plot(E1NSI, E2NSI, 'k-', linewidth=1, label=r'Non-$\bigtriangleup$ [27]')
 
-ax.fill_between(E1_positivity_constraints,
+plt.fill_between(E1_positivity_constraints,
                  [-0.35]* len(E1_positivity_constraints),
                  E2_positivity_constraints, color='#BFBFBF', label='Non-dist.') #gray
-ax.plot(1/3, -5/27, 'ko', markersize=3, fillstyle='none') # interesting point
+plt.plot(1/3, -5/27, 'ko', markersize=3, fillstyle='none') # interesting point
 
 plt.ylim(-0.35, 0.02)
 plt.xlim(0.15, 0.5)
 plt.xlabel(r'$E_1$')
 plt.ylabel(r'$E_2$')
 
-hand, lab = ax.get_legend_handles_labels()
-hand[0].set_edgecolor('black')
-hand[0].set_linewidth(0.2)
-ax.legend(hand, lab, loc='upper left')
 plt.legend()
 
 plt.savefig('NSI_comparison.pdf', bbox_inches='tight')
