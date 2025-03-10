@@ -1,17 +1,17 @@
 import time
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import ticker
 from triangle import TrilocalModel
 from triangle_inequalities import valid_distribution
 
 c_alpha, c_beta, c_gamma = 6, 6, 6
 
-N = 150
+N = 151
 N_trials = 200
-delta3 = 2/N
-delta2 = 4/3/N
 
-e3 = np.arange(-1, 1+delta3, delta3)
-e2 = np.arange(-1/3, 1+delta2, delta2)
+e3 = np.linspace(-1, 1, N)
+e2 = np.linspace(-1/3, 1, N)
 
 E3, E2 = np.meshgrid(e3, e2, indexing='ij')
 E1 = np.empty_like(E3)
@@ -39,3 +39,12 @@ for i, e3_ in enumerate(e3):
 filename = (f'Exploratory_analysis_{c_alpha}{c_beta}{c_gamma}_{N_trials}_trials_'
             + time.strftime("%Y%m%d-%H%M%S") + '.npz')
 np.savez(filename, e3=e3, e2=e2, E3=E3, E2=E2, E1=E1, models=models, error=error)
+
+fig, ax = plt.subplots()
+CP = ax.contourf(E3, E2, error, levels=np.logspace(-6.7, -0.8, 40),
+                 locator=ticker.LogLocator())
+CB = fig.colorbar(CP, ax=ax, shrink=0.85, format=plt.LogFormatterMathtext(),
+                  label='Root-mean-square probability error')
+CB.locator = ticker.LogLocator(10)
+ax.grid()
+plt.show()
