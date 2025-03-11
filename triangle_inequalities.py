@@ -587,6 +587,8 @@ def GHZ_point(e1, e3):
             print(f'{a=}, {b=}, {e1_=}, {e3_=}, {e2[i]=}')
 
     return e2.reshape(e1.shape)
+
+
 def W1_point(e1, e2):
     """
     Computes the values of `e3` for points on the W green surface, given the correlators
@@ -961,41 +963,183 @@ def W5_point_fixed_initial_guesses(e1, e2):
 
 
 # ---------------------------------------- Generate points on boundary (random)
+def choose_GHZ_point():
+    """
+    Randomly selects a point on the GHZ surface.
+
+    The function generates random values for the model parameters `x` and `y`
+    and computes the corresponding correlators `e1`, `e2`, and `e3`. It then
+    checks if the point satisfies the flipped version of the GHZ inequality. If
+    it does, the function recursively calls itself to generate a new point
+    in order to take a point on the local boundary.
+
+    Returns:
+    --------
+    tuple
+        A tuple containing the correlators `(e1, e2, e3)` of a randomly selected point
+        on the GHZ boundary.
+
+    Examples:
+    ---------
+    >>> # Choose a random point on the GHZ surface
+    >>> e1, e2, e3 = choose_GHZ_point()
+    >>> print("Selected point (e1, e2, e3):", e1, e2, e3)
+    """
+    x = np.random.triangular(0, 0, 1)
+    y = np.random.uniform(0, 1-x)
+    e1 = 4*x*y + 2*y**2 -1
+    e2 = 4*x**2*y + 12*x*y**2 - 8*x*y + 4*y**3 - 4*y**2 + 1
+    e3 = -12*x**2*y - 12*x*y**2 + 12*x*y - 4*y**3 + 6*y**2 - 1
+    if GHZ(e1, e2, e3, flip=True) >= 0:
+        e1, e2, e3 = choose_GHZ_point()
+    return e1, e2, e3
+
+
 def choose_W1_point():
-    a = np.linspace(0,0.19158750185069973, 1000)
-    p = (-1 + 2*a + np.sqrt(5 - 8*a + 4*a**2))/2 - (1+a)/4 \
-        - 1/4*np.sqrt((1+5*a**2-2*a**3)/(1-2*a))
+    """
+    Randomly selects a point on the W green surface.
+
+    The function generates random values for the model parameters `x` and `y`
+    and computes the corresponding correlators `e1`, `e2`, and `e3`.
+
+    Returns:
+    --------
+    tuple
+        A tuple containing the correlators `(e1, e2, e3)` of a randomly selected point
+        on the W green surface.
+
+    Examples:
+    ---------
+    >>> # Choose a random point on the W green surface
+    >>> e1, e2, e3 = choose_W1_point()
+    >>> print("Selected point (e1, e2, e3):", e1, e2, e3)
+    """
+    x = np.linspace(0,0.19158750185069973, 1000)
+    p = (-1 + 2*x + np.sqrt(5 - 8*x + 4*x**2))/2 - (1+x)/4 \
+        - 1/4*np.sqrt((1+5*x**2-2*x**3)/(1-2*x))
     p = p/p.sum()
-    a = np.random.choice(a, p=p)
-    b = np.random.uniform((1+a)/4 + 1/4*np.sqrt((1+5*a**2-2*a**3)/(1-2*a)), 
-                          (-1 + 2*a + np.sqrt(5 - 8*a + 4*a**2))/2)
-    e1 = -4*a*b + 2*a + 2*b - 1
-    e2 = -8*a*b**2 + 8*a*b - 4*a + 4*b**2 - 4*b + 1
-    e3 = 16*a**2*b - 8*a**2 - 8*a*b**2 - 4*a*b + 6*a + 4*b**2 - 2*b - 1
+    x = np.random.choice(x, p=p)
+    y = np.random.uniform((1+x)/4 + 1/4*np.sqrt((1+5*x**2-2*x**3)/(1-2*x)),
+                          (-1 + 2*x + np.sqrt(5 - 8*x + 4*x**2))/2)
+    e1 = -4*x*y + 2*x + 2*y - 1
+    e2 = -8*x*y**2 + 8*x*y - 4*x + 4*y**2 - 4*y + 1
+    e3 = 16*x**2*y - 8*x**2 - 8*x*y**2 - 4*x*y + 6*x + 4*y**2 - 2*y - 1
+    return e1, e2, e3
+
+
+def choose_W2_point():
+    """
+    Randomly selects a point on the W purple surface.
+
+    The function generates random values for the model parameters `x` and `y`
+    and computes the corresponding correlators `e1`, `e2`, and `e3`.
+
+    Returns:
+    --------
+    tuple
+        A tuple containing the correlators `(e1, e2, e3)` of a randomly selected point
+        on the W purple surface.
+
+    Examples:
+    ---------
+    >>> # Choose a random point on the W purple surface
+    >>> e1, e2, e3 = choose_W2_point()
+    >>> print("Selected point (e1, e2, e3):", e1, e2, e3)
+    """
+    x = np.linspace(1/2, 1, 1000)
+    ymin = (x < 0.642129856069591) * (3*x**4 - 3*x**3 + 2*x - 1) / (x**4 + x**2 - x)
+    p = 1 - ymin
+    p = p / p.sum()
+    x = np.random.choice(x, p=p)
+    ymin = (x < 0.642129856069591) * (3*x**4 - 3*x**3 + 2*x - 1) / (x**4 + x**2 - x)
+    y = np.random.uniform(ymin, 1)
+    e1 = 1 - 2*x**2
+    e2 = (-8*x**6 + 8*x**5*y + 16*x**5 - 12*x**4*y - 12*x**4 + 5*x**3*y + x**2*y + 6*x**2 - x*y - 4*x + 1) \
+         / (x**3*y - 4*x**3 + x**2*y + 6*x**2 - x*y - 4*x + 1)
+    e3 = (-8*x**6*y + 30*x**5*y - 38*x**4*y + 15*x**3*y + x**2*y + 4*x**2 - x*y - 4*x + 1) \
+         / (x**3*y - 4*x**3 + x**2*y + 6*x**2 - x*y - 4*x + 1)
+    if W1(e1, e2, e3) >= 0 or W3(e1, e2, e3) >= 0 or W4(e1, e2, e3) >= 0:
+        e1, e2, e3 = choose_W5_point()
     return e1, e2, e3
 
 
 def choose_W3_point():
-    e = np.linspace(1/2, 0.642129856069591, 1000)
-    dmin = np.fmax((2*e**2 + np.sqrt(8*e**4 + 4*e**3 - 12*e**2 - 4*e 
-                                     + 5) - 1)/(1-e)/2, 
-                   (e**2 + e - 1)/(2*e - 1))
-    dmax = (-e**3 - e + 1)/(e**2 - 3*e + 2)
-    p = dmax - dmin
+    """
+    Randomly selects a point on the W red surface.
+
+    The function generates random values for the model parameters `x` and `y`
+    and computes the corresponding correlators `e1`, `e2`, and `e3`.
+
+    Returns:
+    --------
+    tuple
+        A tuple containing the correlators `(e1, e2, e3)` of a randomly selected point
+        on the W red surface.
+
+    Examples:
+    ---------
+    >>> # Choose a random point on the W red surface
+    >>> e1, e2, e3 = choose_W3_point()
+    >>> print("Selected point (e1, e2, e3):", e1, e2, e3)
+    """
+    y = np.linspace(1/3, 1, 1000)
+    xmin = np.maximum(1 + 12*y + 3*y**2 - np.sqrt((1 + 12*y + 3*y**2)**2 - 192*y**2),
+                      12*y*(2 + y - np.sqrt(2 + 2*y + y**2)))/(24*y)
+    xmax = np.empty_like(y)
+    for i, y_ in enumerate(y):
+        roots = Polynomial([4 * y_ ** 2 * (1 + y_) ** 2,
+                            -(5 + 16 * y_ + 50 * y_ ** 2 + 24 * y_ ** 3 + y_ ** 4) * y_,
+                            1 + 12 * y_ + 34 * y_ ** 2 + 84 * y_ ** 3 + 45 * y_ ** 4,
+                            -12 * y_ * (1 + 2 * y_ + 5 * y_ ** 2),
+                            16 * y_ ** 2]).roots()
+        xmax[i] = roots.real.min()
+    p = xmax - xmin
     p = p/p.sum()
-    e = np.random.choice(e, p=p)
-    dmin = np.fmax((2*e**2 + np.sqrt(8*e**4 + 4*e**3 - 12*e**2 - 4*e 
-                                     + 5) - 1)/(1-e)/2, 
-                   (e**2 + e - 1)/(2*e - 1))
-    dmax = (-e**3 - e + 1)/(e**2 - 3*e + 2)
-    d = np.random.uniform(dmin, dmax)
-    e1 = 1 - 2*e**2
-    e2 = -8*d*e**2 + 16*d*e - 8*d - 8*e + 5
-    e3 = -16*d*e**2 + 24*d*e - 8*d + 8*e**3 + 6*e**2 - 16*e + 5
+    y = np.random.choice(y, p=p)
+    xmin = np.maximum(1 + 12*y + 3*y**2 - np.sqrt((1 + 12*y + 3*y**2)**2 - 192*y**2),
+                      12*y*(2 + y - np.sqrt(2 + 2*y + y**2)))/(24*y)
+    xmax = Polynomial([4 * y_ ** 2 * (1 + y_) ** 2,
+                       -(5 + 16 * y_ + 50 * y_ ** 2 + 24 * y_ ** 3 + y_ ** 4) * y_,
+                       1 + 12 * y_ + 34 * y_ ** 2 + 84 * y_ ** 3 + 45 * y_ ** 4,
+                       -12 * y_ * (1 + 2 * y_ + 5 * y_ ** 2),
+                       16 * y_ ** 2]).roots().real.min()
+    x = np.random.uniform(xmin, xmax)
+    e1, e2, e3 = (-y * (3 * x - 1) / (x - y),
+                  (4 * x ** 3 * y - 4 * x ** 2 * y ** 2 - 6 * x * y - x + 3 * y) / (x - y),
+                  3 * y * (4 * x ** 3 - 4 * x ** 2 * y - 8 * x ** 2 + 2 * x * y + 5 * x - 1) / (x - y))
     return e1, e2, e3
 
 
 def choose_W4_point():
+    """
+    Randomly selects a point on the W yellow surface.
+
+    The function generates random values for the model parameters `x` and `y`
+    and computes the corresponding correlators `e1`, `e2`, and `e3`.
+
+    Returns:
+    --------
+    tuple
+        A tuple containing the correlators `(e1, e2, e3)` of a randomly selected point
+        on the W yellow surface.
+
+    Examples:
+    ---------
+    >>> # Choose a random point on the W yellow surface
+    >>> e1, e2, e3 = choose_W4_point()
+    >>> print("Selected point (e1, e2, e3):", e1, e2, e3)
+    """
+    x = np.linspace(0, 1, 101)
+    y = np.linspace(0, 1, 101)
+    x, y = np.meshgrid(x, y, indexing='ij')
+    z = (np.sqrt(x) * (y - 1) * (x - y - 1) * np.sqrt(
+        x ** 5 * y ** 4 - 2 * x ** 5 * y ** 3 + x ** 5 * y ** 2 + 2 * x ** 4 * y ** 4 - 2 * x ** 4 * y ** 3 + 2 * x ** 4 * y ** 2 - 2 * x ** 4 * y - 3 * x ** 3 * y ** 4 + 4 * x ** 3 * y ** 3 + 2 * x ** 3 * y + x ** 3 + 4 * x ** 2 * y ** 3 - 10 * x ** 2 * y ** 2 - 2 * x ** 2 - 4 * x * y ** 3 + 12 * x * y ** 2 + x - 4 * y ** 2) - x ** 4 * y ** 3 + 2 * x ** 4 * y ** 2 - x ** 4 * y + x ** 3 * y ** 4 - 2 * x ** 3 * y ** 3 + x ** 3 - x ** 2 * y ** 4 + 2 * x ** 2 * y ** 3 + 2 * x ** 2 * y ** 2 - x ** 2 * y - 2 * x ** 2 - 5 * x * y ** 2 + 4 * x * y + x + 2 * y ** 2 - 2 * y) / (
+                2 * x ** 3 * y ** 5 - 2 * x ** 3 * y ** 4 - 4 * x ** 3 * y ** 3 + 6 * x ** 3 * y ** 2 - 2 * x ** 3 * y - 2 * x ** 2 * y ** 4 + 4 * x ** 2 * y ** 3 - 4 * x ** 2 * y + 2 * x ** 2 + 2 * x * y ** 4 - 2 * x * y ** 3 - 6 * x * y ** 2 + 10 * x * y - 4 * x + 2 * y ** 2 - 4 * y + 2)
+    t = (1 - 2 * z - x + 2 * x * z - x * y ** 2 * z) / (1 - x + y)
+    u = (1 - y) * (1 - z - x + x * z + y * z + x * y - x * y * z - x ** 2 * y * z + x ** 2 * y ** 2 * z) / (
+                1 - x + y) / (1 - x + x * y)
+    v = y * u / (1 - y)
+
     d = np.linspace(0, 1/2, 1000) + 0j
     emin = (2/3)*d - 1/3*2**(1/3)*(-7*d**2 + 8*d - 4)/(34*d**3 - 93*d**2 + 21*d + 3*np.sqrt(3)*np.sqrt(-8*d**6 - 60*d**5 + 87*d**4 + 158*d**3 - 223*d**2 + 74*d - 5) + 11)**(1/3) + (1/6)*2**(2/3)*(34*d**3 - 93*d**2 + 21*d + 3*np.sqrt(3)*np.sqrt(-8*d**6 - 60*d**5 + 87*d**4 + 158*d**3 - 223*d**2 + 74*d - 5) + 11)**(1/3) - 2/3
     d, emin = d.real, emin.real
@@ -1021,27 +1165,21 @@ def choose_W4_point():
 
 
 def choose_W5_point():
-    d = np.linspace(1/2, 1, 1000)
-    qmin = (d<0.642129856069591)*(3*d**4 - 3*d**3 + 2*d - 1)/(d**4 + d**2 - d)
-    p = 1 - qmin
-    p = p/p.sum()
-    d = np.random.choice(d, p=p)
-    qmin = (d<0.642129856069591)*(3*d**4 - 3*d**3 + 2*d - 1)/(d**4 + d**2 - d)
-    q = np.random.uniform(qmin, 1)
-    e1 = 1 - 2*d**2
-    e2 = (-8*d**6 + 8*d**5*q + 16*d**5 - 12*d**4*q - 12*d**4 + 5*d**3*q + d**2*q + 6*d**2 - d*q - 4*d + 1)/(d**3*q - 4*d**3 + d**2*q + 6*d**2 - d*q - 4*d + 1)
-    e3 = (-8*d**6*q + 30*d**5*q - 38*d**4*q + 15*d**3*q + d**2*q + 4*d**2 - d*q - 4*d + 1)/(d**3*q - 4*d**3 + d**2*q + 6*d**2 - d*q - 4*d + 1)
-    if W1(e1, e2, e3) >= 0 or W3(e1, e2, e3) >= 0 or W4(e1, e2, e3) >= 0:
-        e1, e2, e3 = choose_W5_point()
-    return e1, e2, e3
+    """
+    Randomly selects a point on the W cyan surface.
 
+    The function generates random values for the model parameters `x` and `y`
+    and computes the corresponding correlators `e1`, `e2`, and `e3`.
 
-def choose_GHZ_point():
-    a = np.random.triangular(0, 0, 1)
-    b = np.random.uniform(0, 1-a)
-    e1 = 4*a*b + 2*b**2 -1
-    e2 = 4*a**2*b + 12*a*b**2 - 8*a*b + 4*b**3 - 4*b**2 + 1
-    e3 = -12*a**2*b - 12*a*b**2 + 12*a*b - 4*b**3 + 6*b**2 - 1
-    if GHZ(e1, e2, e3, flip=True) >= 0:
-        e1, e2, e3 = choose_GHZ_point()
-    return e1, e2, e3
+    Returns:
+    --------
+    tuple
+        A tuple containing the correlators `(e1, e2, e3)` of a randomly selected point
+        on the W cyan surface.
+
+    Examples:
+    ---------
+    >>> # Choose a random point on the W cyan surface
+    >>> e1, e2, e3 = choose_W5_point()
+    >>> print("Selected point (e1, e2, e3):", e1, e2, e3)
+    """
