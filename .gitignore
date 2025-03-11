@@ -170,4 +170,5 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-extra_subspaces_*.py
+# Test scripts
+__scripts
