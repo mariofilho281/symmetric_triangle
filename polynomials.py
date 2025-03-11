@@ -38,4 +38,13 @@ def tfun(a, c, e1, e2):
     return (1/4)*(4*a**2*c*e1 - 4*a**2*c - 4*a*c**2*e1 - 4*a*c**2 + 4*a*c*e1 + 4*a*c - 4*a*e1 + 2*a*e2 + 2*a + 2*e1**2 - e1*e2 + e1 - e2 - 1)*(4*a**2*c*e1 + 4*a**2*c - 4*a*c**2*e1 + 4*a*c**2 - 4*a*c*e1 - 4*a*c + 4*c*e1 - 2*c*e2 - 2*c - 2*e1**2 + e1*e2 - e1 + e2 + 1)*(16*a**2*c**2*e1 - 4*a**2*c*e1**2 - 8*a**2*c*e1 - 4*a**2*c*e2 - 4*a*c**2*e1**2 - 8*a*c**2*e1 - 4*a*c**2*e2 + 4*a*c*e1**2 + 4*a*c*e1*e2 - 4*a*c*e1 + 8*a*c*e2 + 4*a*c + 4*a*e1**2 - 2*a*e1*e2 + 2*a*e1 - 2*a*e2 - 2*a + 4*c*e1**2 - 2*c*e1*e2 + 2*c*e1 - 2*c*e2 - 2*c - 2*e1**3 + e1**2*e2 - 3*e1**2 + 2*e1*e2 + e2 + 1)/(a*c*(2*e1 - e2 - 1)*(a + c - e1 - 1)*(4*a**2*c*e1 - 4*a**2*c - 4*a**2*e1 + 4*a**2 - 4*a*c**2*e1 - 4*a*c**2 + 8*a*c + 4*a*e1**2 - 4*a + 4*c*e1 - 2*c*e2 - 2*c - 2*e1**2 + e1*e2 - e1 + e2 + 1)*(4*a**2*c*e1 + 4*a**2*c - 4*a*c**2*e1 + 4*a*c**2 - 8*a*c - 4*a*e1 + 2*a*e2 + 2*a + 4*c**2*e1 - 4*c**2 - 4*c*e1**2 + 4*c + 2*e1**2 - e1*e2 + e1 - e2 - 1))
 
 def e3fun(a, c, e1, e2):
+    """
+    Calculates three-body correlator for the general model that generates the
+    W surfaces of colors green, red, yellow, and cyan.
+    :param a:
+    :param c:
+    :param e1:
+    :param e2:
+    :return:
+    """
     return (1/2)*(16*a**2*c**2*e1 - 4*a**2*c*e1**2 - 22*a**2*c*e1 + 6*a**2*c*e2 + 6*a**2*c + 8*a**2*e1 - 4*a**2*e2 - 4*a**2 - 4*a*c**2*e1**2 - 22*a*c**2*e1 + 6*a*c**2*e2 + 6*a*c**2 + 18*a*c*e1**2 - 6*a*c*e1*e2 + 20*a*c*e1 - 10*a*c*e2 - 10*a*c - 8*a*e1**2 + 4*a*e1*e2 - 4*a*e1 + 4*a*e2 + 4*a + 8*c**2*e1 - 4*c**2*e2 - 4*c**2 - 8*c*e1**2 + 4*c*e1*e2 - 4*c*e1 + 4*c*e2 + 4*c + 2*e1**3 - e1**2*e2 + 3*e1**2 - 2*e1*e2 - e2 - 1)/(a*c*(a + c - e1 - 1))
