@@ -172,3 +172,6 @@ cython_debug/
 
 # Test scripts
 __scripts
+
+# pyenv file
+/.python-version
