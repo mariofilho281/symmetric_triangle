@@ -527,6 +527,24 @@ def W5(e1, e2, e3, flip=False):
     return W5.reshape(e1.shape)
 
 
+# ---------------------------------------------- Tests for triangle nonlocality
+def W_test(e1, e2, e3, flip=False):
+    return ((W1(e1, e2, e3, flip) >= 0) | (W2(e1, e2, e3, flip) >= 0)
+            | (W3(e1, e2, e3, flip) >= 0) | (W4(e1, e2, e3, flip)>= 0)
+            | (W5(e1, e2, e3, flip) >= 0))
+
+
+def GHZ_test(e1, e2, e3):
+    return (GHZ(e1, e2, e3) >= 0) | (GHZ(e1, e2, e3, flip=True) >= 0)
+
+
+def nonlocal_test(e1, e2, e3):
+    ghz = GHZ_test(e1, e2, e3)
+    w = W_test(e1, e2, e3)
+    w_flip = W_test(e1, e2, e3, flip=True)
+    return (~ghz) + (~w)*2 + (~w_flip)*3
+
+
 # ------------------------------ Generate points on boundary (given projection)
 def GHZ_point(e1, e3):
     """
