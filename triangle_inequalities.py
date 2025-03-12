@@ -529,20 +529,156 @@ def W5(e1, e2, e3, flip=False):
 
 # ---------------------------------------------- Tests for triangle nonlocality
 def W_test(e1, e2, e3, flip=False):
-    return ((W1(e1, e2, e3, flip) >= 0) | (W2(e1, e2, e3, flip) >= 0)
-            | (W3(e1, e2, e3, flip) >= 0) | (W4(e1, e2, e3, flip)>= 0)
-            | (W5(e1, e2, e3, flip) >= 0))
+    """
+    Tests whether all the W inequalities are violated for a given set of correlators.
+
+    The function evaluates the W inequalities `W1`, `W2`, `W3`, `W4`, and `W5` for the
+    input correlators `e1`, `e2`, and `e3`. If all inequalities are violated (i.e.,
+    all are negative), the function returns `True`, indicating that the behavior is in
+    the W region. Otherwise, it returns `False`.
+
+    By using the `flip` flag, this function can be used to test membership in the
+    flipped W region.
+
+    Parameters:
+    -----------
+    e1 : float or numpy.ndarray
+        The first correlator. Can be a single float or a numpy array of floats.
+    e2 : float or numpy.ndarray
+        The second correlator. Can be a single float or a numpy array of floats.
+    e3 : float or numpy.ndarray
+        The third correlator. Can be a single float or a numpy array of floats.
+    flip : bool, optional
+        If `True`, the correlators `e1`, `e2`, and `e3` are flipped using the
+        `bit_flip` function before evaluating the inequalities (default is `False`).
+
+    Returns:
+    --------
+    bool or numpy.ndarray
+        - If the inputs are floats, returns `True` if all W inequalities are violated,
+          and `False` otherwise.
+        - If the inputs are numpy arrays, returns a boolean array of the same shape,
+          where each element indicates whether all W inequalities are violated for the
+          corresponding set of correlators.
+
+    Examples:
+    ---------
+    >>> # Example with floats
+    >>> e1, e2, e3 = 1/3, -1/3, -1
+    >>> is_in_W_region = W_test(e1, e2, e3)
+    >>> print("Is the behavior in the W region?", is_in_W_region)
+
+    >>> # Example with numpy arrays
+    >>> e1 = np.array([1/3, -1/3])
+    >>> e2 = np.array([-1/3, -1/3])
+    >>> e3 = np.array([-1, 1])
+    >>> is_in_W_region = W_test(e1, e2, e3)
+    >>> print("Are the behaviors in the W region?", is_in_W_region)
+
+    >>> # Using the flip option
+    >>> is_in_flipped_W_region = W_test(e1, e2, e3, flip=True)
+    >>> print("Are the behaviors in the flipped W region?", is_in_flipped_W_region)
+    """
+    return ((W1(e1, e2, e3, flip) < 0) & (W2(e1, e2, e3, flip) < 0)
+            & (W3(e1, e2, e3, flip) < 0) & (W4(e1, e2, e3, flip) < 0)
+            & (W5(e1, e2, e3, flip) < 0))
 
 
 def GHZ_test(e1, e2, e3):
-    return (GHZ(e1, e2, e3) >= 0) | (GHZ(e1, e2, e3, flip=True) >= 0)
+    """
+        Tests whether the GHZ inequality and its bit-flipped version are violated
+        for a given set of correlators.
+
+        The function evaluates the inequalities for the input correlators `e1`,
+        `e2`, and `e3`. If all inequalities are violated (i.e., all are negative),
+        the function returns `True`, indicating that the behavior is in the
+        GHZ region. Otherwise, it returns `False`.
+
+        Parameters:
+        -----------
+        e1 : float or numpy.ndarray
+            The first correlator. Can be a single float or a numpy array of floats.
+        e2 : float or numpy.ndarray
+            The second correlator. Can be a single float or a numpy array of floats.
+        e3 : float or numpy.ndarray
+            The third correlator. Can be a single float or a numpy array of floats.
+
+        Returns:
+        --------
+        bool or numpy.ndarray
+            - If the inputs are floats, returns `True` if all GHZ inequalities
+              are violated, and `False` otherwise.
+            - If the inputs are numpy arrays, returns a boolean array of the same shape,
+              where each element indicates whether all GHZ inequalities are violated
+              for the corresponding set of correlators.
+
+        Examples:
+        ---------
+        >>> # Example with floats
+        >>> e1, e2, e3 = 0, 1, 0
+        >>> is_in_GHZ_region = GHZ_test(e1, e2, e3)
+        >>> print("Is the behavior in the GHZ region?", is_in_GHZ_region)
+
+        >>> # Example with numpy arrays
+        >>> e1 = np.array([0, 1, 1/3])
+        >>> e2 = np.array([1, 1, -1/3])
+        >>> e3 = np.array([0, 1, -1])
+        >>> is_in_GHZ_region = GHZ_test(e1, e2, e3)
+        >>> print("Are the behaviors in the GHZ region?", is_in_GHZ_region)
+        """
+    return (GHZ(e1, e2, e3) < 0) & (GHZ(e1, e2, e3, flip=True) < 0)
 
 
 def nonlocal_test(e1, e2, e3):
+    """
+    Tests membership to the GHZ, W, and flipped W regions for a given set of correlators.
+
+    The function evaluates whether the behavior defined by the correlators `e1`, `e2`,
+    and `e3` exhibits GHZ, W, or flipped W type of nonlocality. It returns:
+    - `0` if the behavior is local (i.e., it does not belong to any of the nonlocal regions).
+    - `1` if the behavior exhibits GHZ-type nonlocality.
+    - `2` if the behavior exhibits W-type nonlocality.
+    - `3` if the behavior exhibits flipped W-type nonlocality.
+
+    Parameters:
+    -----------
+    e1 : float or numpy.ndarray
+        The first correlator. Can be a single float or a numpy array of floats.
+    e2 : float or numpy.ndarray
+        The second correlator. Can be a single float or a numpy array of floats.
+    e3 : float or numpy.ndarray
+        The third correlator. Can be a single float or a numpy array of floats.
+
+    Returns:
+    --------
+    int or numpy.ndarray
+        - If the inputs are floats, returns an integer:
+            - `0`: Behavior is local.
+            - `1`: Behavior exhibits GHZ-type nonlocality.
+            - `2`: Behavior exhibits W-type nonlocality.
+            - `3`: Behavior exhibits flipped W-type nonlocality.
+        - If the inputs are numpy arrays, returns an array of integers with the same
+          shape, where each element corresponds to the result for the corresponding
+          set of correlators.
+
+    Examples:
+    ---------
+    >>> # Example with floats
+    >>> e1, e2, e3 = 1/3, -1/3, -1
+    >>> result = nonlocal_test(e1, e2, e3)
+    >>> print("Nonlocality type:", result)
+
+    >>> # Example with numpy arrays
+    >>> e1 = np.array([1, 0, 1/3, -1/3])
+    >>> e2 = np.array([1, 1, -1/3, -1/3])
+    >>> e3 = np.array([1, 0, -1, 1])
+    >>> result = nonlocal_test(e1, e2, e3)
+    >>> print("Nonlocality types:", result)
+    """
     ghz = GHZ_test(e1, e2, e3)
     w = W_test(e1, e2, e3)
     w_flip = W_test(e1, e2, e3, flip=True)
-    return (~ghz) + (~w)*2 + (~w_flip)*3
+    return (ghz) + (w)*2 + (w_flip)*3
 
 
 # ------------------------------ Generate points on boundary (given projection)
