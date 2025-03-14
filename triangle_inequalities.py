@@ -1,8 +1,8 @@
 import numpy as np
 from numpy.polynomial import Polynomial
 from scipy.optimize import root
-from polynomials import f as F, g as G, Dfa, Dfc, Dga, Dgc, bfun, dfun, efun, \
-    ffun, sfun, tfun, e3fun
+from polynomials import f as F, g as G, Dfx, Dfz, Dgx, Dgz, yfun, tfun, ufun, \
+    vfun, wfun, kfun, e3fun
 
 
 # ----------------------------------------------------------- General utilities
@@ -102,17 +102,17 @@ def bit_flip(e1, e2, e3):
 
 def fun(x, point):
     """
-    Defines a system of equations to solve for the parameters `a` and `c` of the cyan surface,
+    Defines a system of equations to solve for the parameters `x` and `z` of the cyan surface,
     given the correlators `e1` and `e2`.
 
-    This function evaluates two equations, `F(a, c, e1, e2)` and `G(a, c, e1, e2)`, which
-    define the equations on the parameters `a` and `c` for points lying on the cyan surface.
+    This function evaluates two equations, `F(x, z, e1, e2)` and `G(x, z, e1, e2)`, which
+    define the equations on the parameters `x` and `z` for points lying on the cyan surface.
     The system is designed to be solved using numerical solvers like `scipy.optimize.root`.
 
     Parameters:
     -----------
     x : tuple or numpy.ndarray
-        A tuple or array containing the parameters `a` and `c` of the cyan surface.
+        A tuple or array containing the parameters `x` and `z` of the cyan surface.
         These are the variables to be solved for.
     point : tuple or numpy.ndarray
         A tuple or array containing the correlators `e1` and `e2`. These are fixed
@@ -121,17 +121,17 @@ def fun(x, point):
     Returns:
     --------
     tuple
-        A tuple containing the evaluated values of the equations `F(a, c, e1, e2)`
-        and `G(a, c, e1, e2)`. These values represent the residuals of the equations,
+        A tuple containing the evaluated values of the equations `F(x, z, e1, e2)`
+        and `G(x, z, e1, e2)`. These values represent the residuals of the equations,
         which should be zero if evaluated in a solution.
 
     Notes:
     ------
-    - The functions `F` and `G` are defined in the polynomials.py file. They
+    - The functions `f` and `g` are defined in the polynomials.py file. They
       represent the equations that define the cyan surface in terms of the
-      parameters `a` and `c` and the correlators `e1` and `e2`.
+      parameters `x` and `z` and the correlators `e1` and `e2`.
     - This function is intended to be used with numerical solvers like `scipy.optimize.root`
-      to find values of `a` and `c` that satisfy both equations simultaneously.
+      to find values of `x` and `z` that satisfy both equations simultaneously.
     - In general, this system has multiple solutions, so one has to check if the
       positivity constraints are satisfied.
 
@@ -140,9 +140,9 @@ def fun(x, point):
     >>> from scipy.optimize import root
     >>> from triangle_inequalities import fun, e3fun
     >>> e1, e2 = 1/3, -5/27
-    >>> a, c = root(fun, (0.25, 0.25), args=((e1, e2), )).x
-    >>> print(f'a = {a}, c = {c}')
-    >>> print(f'E3 = {e3fun(a, c, e1, e2)}')
+    >>> x, z = root(fun, (0.25, 0.25), args=((e1, e2), )).x
+    >>> print(f'x = {x}, z = {z}')
+    >>> print(f'E3 = {e3fun(x, z, e1, e2)}')
     """
     return F(*x, *point), G(*x, *point)
 
@@ -196,8 +196,8 @@ def jac(x, point):
     >>> print(f'a = {a}, c = {c}')
     >>> print(f'E3 = {e3fun(a, c, e1, e2)}')
     """
-    return np.array([[Dfa(*x, *point), Dfc(*x, *point)], 
-                     [Dga(*x, *point), Dgc(*x, *point)]])
+    return np.array([[Dfx(*x, *point), Dfz(*x, *point)],
+                     [Dgx(*x, *point), Dgz(*x, *point)]])
 
 
 # -------------------------------------------------------- Network inequalities
@@ -236,12 +236,12 @@ def GHZ(e1, e2, e3, flip=False):
     """
     if flip:
         e1, e2, e3 = bit_flip(e1, e2, e3)
-    GHZ = 8*(1+e1)**3*(11 + 37*e1 + 28*e1**2 - 4*e1**3 + 8*e2 + 13*e1*e2 
+    ghz = 8*(1+e1)**3*(11 + 37*e1 + 28*e1**2 - 4*e1**3 + 8*e2 + 13*e1*e2
                        + e2**2 - 11*e3 - 18*e1*e3 - 3*e2*e3 + 2*e3**2) \
         - (3 + 5*e1 + e2 - e3)**4 + np.sqrt((3 + 5*e1 + e2 - e3)**2 
                                             - 8*(1+e1)**3)\
             *((3 + 5*e1 + e2 - e3)**3 - 4*(1+e1)**3*(7 + 11*e1 + e2 - 3*e3))
-    return np.where((3 + 5*e1 + e2 - e3)**2 >= 8*(1 + e1)**3, GHZ, np.inf)
+    return np.where((3 + 5*e1 + e2 - e3)**2 >= 8*(1 + e1)**3, ghz, np.inf)
 
 
 def W1(e1, e2, e3, flip=False):
@@ -279,9 +279,9 @@ def W1(e1, e2, e3, flip=False):
     """
     if flip:
         e1, e2, e3 = bit_flip(e1, e2, e3)
-    W1 = -4*e1**2 + 4*e1**3 + (1 + e2 + np.sqrt((1+e2)**2 - 4*e1**2))\
+    w1 = -4*e1**2 + 4*e1**3 + (1 + e2 + np.sqrt((1+e2)**2 - 4*e1**2))\
         *(1 - e1 + e2 + e3 - 2*e1*e2)
-    return W1
+    return w1
 
 
 def W2(e1, e2, e3, flip=False):
@@ -319,9 +319,8 @@ def W2(e1, e2, e3, flip=False):
     """
     if flip:
         e1, e2, e3 = bit_flip(e1, e2, e3)
-    # W2 = e3 - (68*e1**6 + 11*e1**5*e2 - 411*e1**5 - 4*e1**4*e2**2 - 123*e1**4*e2 + 795*e1**4 + 141*e1**3*e2**2 + 495*e1**3*e2 - 784*e1**3 - 557*e1**2*e2**2 - 407*e1**2*e2 + 364*e1**2 + 543*e1*e2**2 + 18*e1*e2 - 13*e1 - 99*e2**2 - 34*e2 + np.sqrt(2)*np.sqrt(1 - e1)*(-8*e1**6 - 2*e1**5*e2 + 140*e1**5 + 24*e1**4*e2 - 378*e1**4 - 25*e1**3*e2**2 - 203*e1**3*e2 + 430*e1**3 + 228*e1**2*e2**2 + 290*e1**2*e2 - 252*e1**2 - 349*e1*e2**2 - e1*e2 + 10*e1 + 70*e2**2 + 24*e2 + 2) - 3)/(-4*e1**5 - e1**4*e2 + 49*e1**4 + 33*e1**3*e2 - 109*e1**3 - 131*e1**2*e2 + 111*e1**2 + 131*e1*e2 - 51*e1 - 24*e2 + np.sqrt(2)*np.sqrt(1 - e1)*(-14*e1**4 - 6*e1**3*e2 + 52*e1**3 + 53*e1**2*e2 - 59*e1**2 - 84*e1*e2 + 38*e1 + 17*e2 + 3) - 4)
-    W2 = 8*e1**5 - 15*e1**4 - 16*e1**3*e2 + 6*e1**3*e3 + 22*e1**3 + 16*e1**2*e2**2 - 8*e1**2*e2*e3 - 2*e1**2*e2 + e1**2*e3**2 - 12*e1**2*e3 - 20*e1**2 - 6*e1*e2**2 + 10*e1*e2*e3 + 12*e1*e2 - 2*e1*e3**2 + 10*e1*e3 + 10*e1 - e2**2 - 8*e2*e3 - 6*e2 + 2*e3**2 - 1
-    return np.where(e1 >= 1/3, W2, -np.inf)
+    w2 = 8*e1**5 - 15*e1**4 - 16*e1**3*e2 + 6*e1**3*e3 + 22*e1**3 + 16*e1**2*e2**2 - 8*e1**2*e2*e3 - 2*e1**2*e2 + e1**2*e3**2 - 12*e1**2*e3 - 20*e1**2 - 6*e1*e2**2 + 10*e1*e2*e3 + 12*e1*e2 - 2*e1*e3**2 + 10*e1*e3 + 10*e1 - e2**2 - 8*e2*e3 - 6*e2 + 2*e3**2 - 1
+    return np.where(e1 >= 1/3, w2, -np.inf)
 
 
 def W3(e1, e2, e3, flip=False):
@@ -363,10 +362,10 @@ def W3(e1, e2, e3, flip=False):
              & (4*e1**4 - 8*e1**3 + 4*e1**2*e2 + 12*e1**2 + 2*e1*e2**2 + 4*e1*e2
                 + 2*e1 - e2**2 - 2*e2 - 1 >= 0)
              & (e3 >= 6 - 3*np.sqrt(5)))
-    W3 = np.where(valid, 
+    w3 = np.where(valid,
                   216*e1**5 - 108*e1**4*e2 - 162*e1**4 - 54*e1**3*e2 + 270*e1**3*e3 - 54*e1**3 + 162*e1**2*e2**2 - 216*e1**2*e2*e3 + 351*e1**2*e2 + 54*e1**2*e3**2 - 270*e1**2*e3 + 189*e1**2 - 54*e1*e2**3 + 54*e1*e2**2*e3 - 216*e1*e2**2 - 18*e1*e2*e3**2 + 162*e1*e2*e3 - 270*e1*e2 + 2*e1*e3**3 + 18*e1*e3**2 + 108*e1*e3 - 108*e1 + 27*e2**3 + 81*e2**2 - 9*e2*e3**2 + 81*e2 + 2*e3**3 - 9*e3**2 + 27, 
                   -np.inf)
-    return W3
+    return w3
 
 
 def W4(e1, e2, e3, flip=False):
@@ -404,8 +403,8 @@ def W4(e1, e2, e3, flip=False):
     """
     if flip:
         e1, e2, e3 = bit_flip(e1, e2, e3)
-    W4 = 256*e1**8 - 256*e1**7*e2 - 882*e1**7 + 64*e1**6*e2**2 + 504*e1**6*e2 + 88*e1**6*e3 + 1013*e1**6 + 212*e1**5*e2**2 - 232*e1**5*e2*e3 + 161*e1**5*e2 + 36*e1**5*e3**2 - 299*e1**5*e3 - 252*e1**5 - 184*e1**4*e2**3 + 168*e1**4*e2**2*e3 - 766*e1**4*e2**2 - 24*e1**4*e2*e3**2 + 476*e1**4*e2*e3 - 919*e1**4*e2 - 8*e1**4*e3**3 - 62*e1**4*e3**2 + 409*e1**4*e3 - 345*e1**4 + 30*e1**3*e2**4 - 40*e1**3*e2**3*e3 + 258*e1**3*e2**3 + 4*e1**3*e2**2*e3**2 - 138*e1**3*e2**2*e3 + 432*e1**3*e2**2 + 8*e1**3*e2*e3**3 - 66*e1**3*e2*e3**2 - 192*e1**3*e2*e3 + 530*e1**3*e2 - 2*e1**3*e3**4 + 42*e1**3*e3**3 + 16*e1**3*e3**2 - 278*e1**3*e3 + 270*e1**3 - 7*e1**2*e2**4 - 36*e1**2*e2**3*e3 + 118*e1**2*e2**3 + 86*e1**2*e2**2*e3**2 - 230*e1**2*e2**2*e3 + 364*e1**2*e2**2 - 52*e1**2*e2*e3**3 + 154*e1**2*e2*e3**2 - 152*e1**2*e2*e3 + 98*e1**2*e2 + 9*e1**2*e3**4 - 42*e1**2*e3**3 + 12*e1**2*e3**2 + 82*e1**2*e3 - 61*e1**2 - 3*e1*e2**5 + 13*e1*e2**4*e3 - 52*e1*e2**4 - 22*e1*e2**3*e3**2 + 112*e1*e2**3*e3 - 290*e1*e2**3 + 18*e1*e2**2*e3**3 - 88*e1*e2**2*e3**2 + 250*e1*e2**2*e3 - 404*e1*e2**2 - 7*e1*e2*e3**4 + 32*e1*e2*e3**3 - 62*e1*e2*e3**2 + 136*e1*e2*e3 - 147*e1*e2 + e1*e3**5 - 4*e1*e3**4 + 6*e1*e3**3 - 4*e1*e3**2 + e1*e3 + e2**5 - 3*e2**4*e3 + 29*e2**4 + 2*e2**3*e3**2 - 36*e2**3*e3 + 98*e2**3 + 2*e2**2*e3**3 - 2*e2**2*e3**2 - 50*e2**2*e3 + 98*e2**2 - 3*e2*e3**4 + 12*e2*e3**3 - 2*e2*e3**2 - 36*e2*e3 + 29*e2 + e3**5 - 3*e3**4 + 2*e3**3 + 2*e3**2 - 3*e3 + 1
-    return W4
+    w4 = 256*e1**8 - 256*e1**7*e2 - 882*e1**7 + 64*e1**6*e2**2 + 504*e1**6*e2 + 88*e1**6*e3 + 1013*e1**6 + 212*e1**5*e2**2 - 232*e1**5*e2*e3 + 161*e1**5*e2 + 36*e1**5*e3**2 - 299*e1**5*e3 - 252*e1**5 - 184*e1**4*e2**3 + 168*e1**4*e2**2*e3 - 766*e1**4*e2**2 - 24*e1**4*e2*e3**2 + 476*e1**4*e2*e3 - 919*e1**4*e2 - 8*e1**4*e3**3 - 62*e1**4*e3**2 + 409*e1**4*e3 - 345*e1**4 + 30*e1**3*e2**4 - 40*e1**3*e2**3*e3 + 258*e1**3*e2**3 + 4*e1**3*e2**2*e3**2 - 138*e1**3*e2**2*e3 + 432*e1**3*e2**2 + 8*e1**3*e2*e3**3 - 66*e1**3*e2*e3**2 - 192*e1**3*e2*e3 + 530*e1**3*e2 - 2*e1**3*e3**4 + 42*e1**3*e3**3 + 16*e1**3*e3**2 - 278*e1**3*e3 + 270*e1**3 - 7*e1**2*e2**4 - 36*e1**2*e2**3*e3 + 118*e1**2*e2**3 + 86*e1**2*e2**2*e3**2 - 230*e1**2*e2**2*e3 + 364*e1**2*e2**2 - 52*e1**2*e2*e3**3 + 154*e1**2*e2*e3**2 - 152*e1**2*e2*e3 + 98*e1**2*e2 + 9*e1**2*e3**4 - 42*e1**2*e3**3 + 12*e1**2*e3**2 + 82*e1**2*e3 - 61*e1**2 - 3*e1*e2**5 + 13*e1*e2**4*e3 - 52*e1*e2**4 - 22*e1*e2**3*e3**2 + 112*e1*e2**3*e3 - 290*e1*e2**3 + 18*e1*e2**2*e3**3 - 88*e1*e2**2*e3**2 + 250*e1*e2**2*e3 - 404*e1*e2**2 - 7*e1*e2*e3**4 + 32*e1*e2*e3**3 - 62*e1*e2*e3**2 + 136*e1*e2*e3 - 147*e1*e2 + e1*e3**5 - 4*e1*e3**4 + 6*e1*e3**3 - 4*e1*e3**2 + e1*e3 + e2**5 - 3*e2**4*e3 + 29*e2**4 + 2*e2**3*e3**2 - 36*e2**3*e3 + 98*e2**3 + 2*e2**2*e3**3 - 2*e2**2*e3**2 - 50*e2**2*e3 + 98*e2**2 - 3*e2*e3**4 + 12*e2*e3**3 - 2*e2*e3**2 - 36*e2*e3 + 29*e2 + e3**5 - 3*e3**4 + 2*e3**3 + 2*e3**2 - 3*e3 + 1
+    return w4
 
 
 def W5(e1, e2, e3, flip=False):
@@ -495,36 +494,36 @@ def W5(e1, e2, e3, flip=False):
             x0 = solution.x
         
         solution = root(fun, x0, args=((e1_, e2_), ), jac=jac)
-        a, c = solution.x
-        b = bfun(a, c, e1_, e2_)
-        d = dfun(a, c, e1_, e2_)
-        e = efun(a, c, e1_, e2_)
-        f = ffun(a, c, e1_, e2_)
-        s = sfun(a, c, e1_, e2_)
-        t = tfun(a, c, e1_, e2_)
-        e3_ = e3fun(a, c, e1_, e2_)
-        if (a>=0 and b>=0 and a+b<=1 and c>=0 and d>=0 and c+d<=1 and e>=0 
-                and f>=0 and e+f<=1 and s>=0 and s<=1 
-                and np.isclose(t, 1, rtol=1e-3) and e3_ < e3_W5[i]):
-            e3_W5[i] = e3fun(a, c, e1_, e2_)
+        x, z = solution.x
+        y = yfun(x, z, e1_, e2_)
+        t = tfun(x, z, e1_, e2_)
+        u = ufun(x, z, e1_, e2_)
+        v = vfun(x, z, e1_, e2_)
+        w = wfun(x, z, e1_, e2_)
+        k = kfun(x, z, e1_, e2_)
+        e3_ = e3fun(x, z, e1_, e2_)
+        if (x>=0 and y>=0 and x+y<=1 and z>=0 and t>=0 and z+t<=1 and u>=0
+                and v>=0 and u+v<=1 and w>=0 and w<=1
+                and np.isclose(k, 1, rtol=1e-3) and e3_ < e3_W5[i]):
+            e3_W5[i] = e3fun(x, z, e1_, e2_)
         
         for x0 in initial_guesses:
             solution = root(fun, x0, args=((e1_, e2_), ), method='hybr', jac=jac)
-            a, c = solution.x
-            b = bfun(a, c, e1_, e2_)
-            d = dfun(a, c, e1_, e2_)
-            e = efun(a, c, e1_, e2_)
-            f = ffun(a, c, e1_, e2_)
-            s = sfun(a, c, e1_, e2_)
-            t = tfun(a, c, e1_, e2_)
-            e3_ = e3fun(a, c, e1_, e2_)
-            if (a>=0 and b>=0 and a+b<=1 and c>=0 and d>=0 and c+d<=1 and e>=0 
-                    and f>=0 and e+f<=1 and s>=0 and s<=1 
-                    and np.isclose(t, 1, rtol=1e-3) and e3_ < e3_W5[i]):
-                e3_W5[i] = e3fun(a, c, e1_, e2_)
+            x, z = solution.x
+            y = yfun(x, z, e1_, e2_)
+            t = tfun(x, z, e1_, e2_)
+            u = ufun(x, z, e1_, e2_)
+            v = vfun(x, z, e1_, e2_)
+            w = wfun(x, z, e1_, e2_)
+            k = kfun(x, z, e1_, e2_)
+            e3_ = e3fun(x, z, e1_, e2_)
+            if (x>=0 and y>=0 and x+y<=1 and z>=0 and t>=0 and z+t<=1 and u>=0
+                    and v>=0 and u+v<=1 and w>=0 and w<=1
+                    and np.isclose(k, 1, rtol=1e-3) and e3_ < e3_W5[i]):
+                e3_W5[i] = e3fun(x, z, e1_, e2_)
 
-    W5 = e3 - e3_W5
-    return W5.reshape(e1.shape)
+    w5 = e3 - e3_W5
+    return w5.reshape(e1.shape)
 
 
 # ---------------------------------------------- Tests for triangle nonlocality
@@ -1070,18 +1069,18 @@ def W5_point(e1, e2):
             x0 = solution.x
         
         solution = root(fun, x0, args=((e1_, e2_), ), jac=jac)
-        a, c = solution.x
-        b = bfun(a, c, e1_, e2_)
-        d = dfun(a, c, e1_, e2_)
-        e = efun(a, c, e1_, e2_)
-        f = ffun(a, c, e1_, e2_)
-        s = sfun(a, c, e1_, e2_)
-        t = tfun(a, c, e1_, e2_)
-        e3_ = e3fun(a, c, e1_, e2_)
-        if (a>=0 and b>=0 and a+b<=1 and c>=0 and d>=0 and c+d<=1 and e>=0 
-                and f>=0 and e+f<=1 and s>=0 and s<=1 
-                and np.isclose(t, 1, rtol=1e-3) and e3_ < e3[i]):
-            e3[i] = e3fun(a, c, e1_, e2_)
+        x, z = solution.x
+        y = yfun(x, z, e1_, e2_)
+        t = tfun(x, z, e1_, e2_)
+        u = ufun(x, z, e1_, e2_)
+        v = vfun(x, z, e1_, e2_)
+        w = wfun(x, z, e1_, e2_)
+        k = kfun(x, z, e1_, e2_)
+        e3_ = e3fun(x, z, e1_, e2_)
+        if (x>=0 and y>=0 and x+y<=1 and z>=0 and t>=0 and z+t<=1 and u>=0
+                and v>=0 and u+v<=1 and w>=0 and w<=1
+                and np.isclose(k, 1, rtol=1e-3) and e3_ < e3[i]):
+            e3[i] = e3fun(x, z, e1_, e2_)
     return e3
 
 
@@ -1101,18 +1100,18 @@ def W5_point_fixed_initial_guesses(e1, e2):
         
         for x0 in initial_guesses:
             solution = root(fun, x0, args=((e1_, e2_), ), method='hybr', jac=jac)
-            a, c = solution.x
-            b = bfun(a, c, e1_, e2_)
-            d = dfun(a, c, e1_, e2_)
-            e = efun(a, c, e1_, e2_)
-            f = ffun(a, c, e1_, e2_)
-            s = sfun(a, c, e1_, e2_)
-            t = tfun(a, c, e1_, e2_)
-            e3_ = e3fun(a, c, e1_, e2_)
-            if (a>=0 and b>=0 and a+b<=1 and c>=0 and d>=0 and c+d<=1 and e>=0 
-                    and f>=0 and e+f<=1 and s>=0 and s<=1 
+            x, z = solution.x
+            y = yfun(x, z, e1_, e2_)
+            t = tfun(x, z, e1_, e2_)
+            u = ufun(x, z, e1_, e2_)
+            v = vfun(x, z, e1_, e2_)
+            w = wfun(x, z, e1_, e2_)
+            k = kfun(x, z, e1_, e2_)
+            e3_ = e3fun(x, z, e1_, e2_)
+            if (x>=0 and y>=0 and x+y<=1 and z>=0 and t>=0 and z+t<=1 and u>=0
+                    and v>=0 and u+v<=1 and w>=0 and w<=1
                     and np.isclose(t, 1, rtol=1e-3) and e3_ < e3[i]):
-                e3[i] = e3fun(a, c, e1_, e2_)
+                e3[i] = e3fun(x, z, e1_, e2_)
     return e3
 
 

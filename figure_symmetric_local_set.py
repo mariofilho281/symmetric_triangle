@@ -2,8 +2,7 @@ import numpy as np
 import vtk
 import pyvista as pv
 from numpy.polynomial import Polynomial
-from triangle_inequalities import (GHZ, W1, W2, W3, W4, W5, 
-                                   W5_point, valid_distribution)
+from triangle_inequalities import valid_distribution
 
 
 # ------------------------------------------------------ variable step 1d array
