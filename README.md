@@ -45,15 +45,10 @@ If you would like to cite this work, please use the following format:
 J. M. da Silva, A. Pozas-Kerstjens, and F. Parisio, _Local models and Bell inequalities for the minimal triangle network_, ???, arXiv:????.?????
 
 ```
-@article{minimal_triangle,
-  title = {Local models and Bell inequalities for the minimal triangle network},
+@misc{minimal_triangle,
+  title = {Local models and {B}ell inequalities for the minimal triangle network},
   author = {da Silva, Jos\'e M\'ario and Pozas-Kerstjens, Alejandro and 
   Parisio, Fernando},
-  journal = {???},
-  volume = {???},
-  pages = {???},
-  doi = {???},
-  url = {???},
   archivePrefix = {arXiv},
   eprint = {???},
   year = {2025}
