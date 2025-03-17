@@ -20,6 +20,9 @@ Files:
 * Figure generation:
   - [figure_symmetric_local_set.py](https://github.com/mariofilho281/symmetric_triangle/blob/main/figure_symmetric_local_set.py): generates an interactive version of the 3D representation of the proposed local boundaries.
   - [fig4a.py](https://github.com/mariofilho281/symmetric_triangle/blob/main/fig4a.py) and [fig4b.py](https://github.com/mariofilho281/symmetric_triangle/blob/main/fig4b.py): generate 2D plots showing the regions accessible with local strategies and the NSI-incompatible behaviors.
+  - [e1e2_nsi_boundary_old.py](https://github.com/mariofilho281/symmetric_triangle/blob/main/e1e2_nsi_boundary_old.py): code to generate the NSI boundary in the ![](https://latex.codecogs.com/svg.latex?E_1) - ![](https://latex.codecogs.com/svg.latex?E_2) plane (in Figure 4a in the manuscript) given in the paper ..., using the [inflation](https://www.github.com/ecboghiu/inflation) library.
+  - [e1e2_nsi_boundary_improved.py](https://github.com/mariofilho281/symmetric_triangle/blob/main/e1e2_nsi_boundary_improved.py): code to generate the improved approximation of the NSI boundary (in Figure 4a in the manuscript) in the ![](https://latex.codecogs.com/svg.latex?E_1) - ![](https://latex.codecogs.com/svg.latex?E_2) plane, using the higher inflation levels.
+  - [lambdapm_class_boundary.py](https://github.com/mariofilho281/symmetric_triangle/blob/main/lambdapm_class_boundary.py): code to generate the approximation of the classical boundary in Figure 4b in the manuscript.
 
 * Utilities
   - [triangle_inequalities.py](https://github.com/mariofilho281/symmetric_triangle/blob/main/triangle_inequalities.py): functions for evaluating the inequalities, test nonlocality and membership in the GHZ and W regions, and generating points on the local boundaries.
