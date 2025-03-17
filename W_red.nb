@@ -23,10 +23,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[      1060,         20]
-NotebookDataLength[     31388,        934]
-NotebookOptionsPosition[     28850,        885]
-NotebookOutlinePosition[     29272,        902]
-CellTagsIndexPosition[     29229,        899]
+NotebookDataLength[     31731,        943]
+NotebookOptionsPosition[     29101,        893]
+NotebookOutlinePosition[     29523,        910]
+CellTagsIndexPosition[     29480,        907]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -798,6 +798,14 @@ Cell[BoxData[
   "Out[165]=",ExpressionUUID->"93ed8371-e942-4100-b814-56d2b0a0dd4f"]
 }, Open  ]],
 
+Cell["\<\
+The expression for the associated inequality can be derived with the use of \
+elimination via Gr\[ODoubleDot]bner basis.\
+\>", "Text",
+ CellChangeTimes->{
+  3.9512162087094097`*^9},ExpressionUUID->"3c7929a6-af67-42b6-9aaa-\
+c70d534181fd"],
+
 Cell[CellGroupData[{
 
 Cell[BoxData[
@@ -945,9 +953,10 @@ Cell[24698, 752, 339, 11, 67, "Output",ExpressionUUID->"e4409a28-9f7c-4fb7-98c9-
 Cell[25040, 765, 472, 14, 64, "Output",ExpressionUUID->"ea1e759b-e96d-4328-840a-eceee29b939a"],
 Cell[25515, 781, 520, 16, 67, "Output",ExpressionUUID->"93ed8371-e942-4100-b814-56d2b0a0dd4f"]
 }, Open  ]],
+Cell[26050, 800, 248, 6, 42, "Text",ExpressionUUID->"3c7929a6-af67-42b6-9aaa-c70d534181fd"],
 Cell[CellGroupData[{
-Cell[26072, 802, 734, 21, 107, "Input",ExpressionUUID->"dbe2a909-d693-4a43-a86d-e02c829fe7af"],
-Cell[26809, 825, 2025, 57, 110, "Output",ExpressionUUID->"b5bdb862-ad0e-4174-8f71-9fad48899dce"]
+Cell[26323, 810, 734, 21, 107, "Input",ExpressionUUID->"dbe2a909-d693-4a43-a86d-e02c829fe7af"],
+Cell[27060, 833, 2025, 57, 93, "Output",ExpressionUUID->"b5bdb862-ad0e-4174-8f71-9fad48899dce"]
 }, Open  ]]
 }
 ]
