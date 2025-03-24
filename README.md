@@ -1,4 +1,4 @@
-## Computational appendix to *[Local models and Bell inequalities for the minimal triangle network](https://www.arxiv.org/abs/????.?????)*
+## Computational appendix to *[Local models and Bell inequalities for the minimal triangle network](https://www.arxiv.org/abs/2503.16654)*
 #### José Mário da Silva, Alejandro Pozas-Kerstjens, and Fernando Parisio 
 
 This repository contains the computational appendix to the paper "*Local models and Bell inequalities for the minimal triangle network*". It provides the codes that were used to generate the figures in the manuscript, and several utility functions, such as tests to ascertain which kind of nonlocality a given behavior exhibits, functions to calculate the inequalities reported in the paper, and routines to generate distributions on the proposed local boundaries.
