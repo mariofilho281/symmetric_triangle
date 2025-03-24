@@ -42,7 +42,7 @@ Files:
 #### Citing
 If you would like to cite this work, please use the following format:
 
-J. M. da Silva, A. Pozas-Kerstjens, and F. Parisio, Local models and bell inequalities for the minimal triangle network (2025), arXiv:2503.16654 [quant-ph].
+J. M. da Silva, A. Pozas-Kerstjens, and F. Parisio, Local models and Bell inequalities for the minimal triangle network (2025), arXiv:2503.16654 [quant-ph].
 
 ```
 @misc{minimal_triangle,
